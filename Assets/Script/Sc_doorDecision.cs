@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Sc_doorDecision : MonoBehaviour
 {
-    public Sc_Map mapAnomalyGame; // Drag and drop the MapAnomalyGame script object here
+    public Sc_Map mapAnomalyGame; // Drag and drop the Sc_Map script object here
     public bool isYesDoor; // Set to true for Yes door, false for No door
 
     private void OnTriggerEnter(Collider other)
@@ -13,11 +13,13 @@ public class Sc_doorDecision : MonoBehaviour
         {
             if (isYesDoor)
             {
-                mapAnomalyGame.PlayerChoseYes(); // Memilih Yes
+                Debug.Log("Player memilih Yes.");
+                mapAnomalyGame.PlayerChoseYes(); // Memilih Yes, map akan di-spawn di lokasi Yes
             }
             else
             {
-                mapAnomalyGame.PlayerChoseNo(); // Memilih No
+                Debug.Log("Player memilih No.");
+                mapAnomalyGame.PlayerChoseNo(); // Memilih No, map akan di-spawn di lokasi No
             }
         }
     }

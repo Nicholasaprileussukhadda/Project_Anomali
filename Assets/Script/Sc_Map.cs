@@ -1,153 +1,119 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // Jika kamu ingin menampilkan score dengan UI
+using UnityEngine.UI; // Jika ingin menampilkan skor dengan UI
 
 public class Sc_Map : MonoBehaviour
 {
-    [SerializeField] private Transform spawnLocationYes;  // Lokasi di mana map akan di-spawn ketika memilih Yes
-    [SerializeField] private Transform spawnLocationNo;   // Lokasi di mana map akan di-spawn ketika memilih No
+    [SerializeField] private Transform spawnLocationYes;  // Lokasi untuk spawn jika memilih Yes
+    [SerializeField] private Transform spawnLocationNo;   // Lokasi untuk spawn jika memilih No
     [SerializeField] private GameObject mapPrefab;        // Prefab map yang akan di-spawn
-    [SerializeField] private List<GameObject> objectsInMap; // Daftar objek di dalam map yang mungkin mengalami anomali
-    [SerializeField] private GameObject player;           // Referensi ke pemain, pastikan ini adalah GameObject
+    [SerializeField] private List<GameObject> objectsInMap; // Daftar objek di map yang mungkin mengalami anomali
+    [SerializeField] private GameObject player;           // Referensi ke pemain
     [SerializeField] [Range(0, 100)] private int anomalyChance = 50; // Persentase peluang anomali terjadi
-    [SerializeField] private Text scoreText;              // UI Text untuk menampilkan skor, opsional
+    [SerializeField] private Text scoreText;              // UI Text untuk menampilkan skor
 
     private GameObject currentMapInstance;  // Referensi ke map yang di-spawn sebelumnya
-    private bool mapSpawned = false;        // Untuk memastikan map hanya di-spawn sekali per trigger
     private bool isAnomalyPresent = false;  // Apakah anomali diterapkan pada map ini
-    private int scoreCounter = 0;           // Counter untuk score
-    private Transform nextSpawnLocation;    // Lokasi spawn berikutnya, bergantung pada pintu Yes/No
+    private int scoreCounter = 0;           // Counter untuk skor
+    private Transform nextSpawnLocation;    // Lokasi spawn berikutnya, tergantung pilihan Yes/No
+    private bool mapSpawned = false;        // Apakah map sudah di-spawn
 
     private void Start()
     {
-        UpdateScoreUI(); // Inisialisasi UI score, jika digunakan
         Debug.Log("Game dimulai, siap untuk spawn map.");
 
-        // Debugging untuk memeriksa apakah referensi Player sudah benar
-        if (player != null)
+        // Cek referensi
+        if (spawnLocationYes == null || spawnLocationNo == null)
         {
-            Debug.Log("Player berhasil terhubung dengan script Sc_Map.");
-        }
-        else
-        {
-            Debug.LogError("Player tidak terhubung. Pastikan kamu drag objek Player yang benar.");
+            Debug.LogError("Spawn location Yes atau No belum di-assign!");
         }
 
-        // Cek posisi awal dari spawnLocationYes dan spawnLocationNo
-        if (spawnLocationYes != null)
+        if (player == null)
         {
-            Debug.Log("Posisi spawnLocationYes: " + spawnLocationYes.position + ", Rotasi: " + spawnLocationYes.rotation);
-        }
-        else
-        {
-            Debug.LogError("spawnLocationYes belum di-*assign*.");
+            Debug.LogError("Player belum di-assign!");
         }
 
-        if (spawnLocationNo != null)
-        {
-            Debug.Log("Posisi spawnLocationNo: " + spawnLocationNo.position + ", Rotasi: " + spawnLocationNo.rotation);
-        }
-        else
-        {
-            Debug.LogError("spawnLocationNo belum di-*assign*.");
-        }
+        UpdateScoreUI(); // Inisialisasi UI skor
+        isAnomalyPresent = false; // Map pertama tidak ada anomali
+        mapSpawned = false; // Map pertama belum di-spawn
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Player mencoba memasuki area trigger");
-        if (other.CompareTag("Player") && !mapSpawned)
-        {
-            Debug.Log("Player masuk ke trigger area.");
-
-            if (nextSpawnLocation == null)
-            {
-                Debug.LogError("nextSpawnLocation tidak di-set!");
-                return;  // Keluar dari fungsi jika nextSpawnLocation belum di-set
-            }
-
-            Debug.Log("Memulai spawn map di lokasi: " + nextSpawnLocation.position);
-            Debug.Log("Spawn prefab: " + mapPrefab.name);
-
-            // Spawn map baru di lokasi yang telah ditentukan (nextSpawnLocation)
-            currentMapInstance = Instantiate(mapPrefab, nextSpawnLocation.position, nextSpawnLocation.rotation);
-
-            // Verifikasi apakah map benar-benar di-*spawn*
-            if (currentMapInstance != null)
-            {
-                Debug.Log("Map berhasil di-*spawn* di lokasi: " + nextSpawnLocation.position);
-                Debug.Log("Posisi map: " + currentMapInstance.transform.position);
-                Debug.Log("Ukuran map: " + currentMapInstance.transform.localScale);
-            }
-            else
-            {
-                Debug.LogError("Map gagal di-*spawn*.");
-            }
-
-            mapSpawned = true;  // Pastikan map hanya di-spawn sekali
-        }
-    }
-
-    // Panggil ini saat player masuk pintu Yes
     public void PlayerChoseYes()
     {
-        nextSpawnLocation = spawnLocationYes; // Tentukan lokasi spawn di belakang pintu Yes
-        Debug.Log("Player memilih Yes. Map berikutnya akan muncul di: " + nextSpawnLocation.position);
-        Debug.Log("Rotasi spawn lokasi Yes: " + nextSpawnLocation.rotation);
-        if (isAnomalyPresent)
+        if (!mapSpawned) // Pastikan map belum di-spawn
         {
-            CorrectChoice(); // Pemain benar, karena ada anomali dan memilih Yes
+            nextSpawnLocation = spawnLocationYes; // Tentukan lokasi spawn di pintu Yes
+            Debug.Log("Player memilih Yes. Map berikutnya akan muncul di: " + nextSpawnLocation.position);
+            ProcessMap(); // Proses map baru dengan kemungkinan anomali
         }
         else
         {
-            WrongChoice(); // Pemain salah, tidak ada anomali, tetapi memilih Yes
+            Debug.LogWarning("Map sudah di-spawn. Menunggu map baru.");
         }
     }
 
-    // Panggil ini saat player masuk pintu No
     public void PlayerChoseNo()
     {
-        nextSpawnLocation = spawnLocationNo; // Tentukan lokasi spawn di belakang pintu No
-        Debug.Log("Player memilih No. Map berikutnya akan muncul di: " + nextSpawnLocation.position);
-        Debug.Log("Rotasi spawn lokasi No: " + nextSpawnLocation.rotation);
-        if (!isAnomalyPresent)
+        if (!mapSpawned) // Pastikan map belum di-spawn
         {
-            CorrectChoice(); // Pemain benar, tidak ada anomali dan memilih No
+            nextSpawnLocation = spawnLocationNo; // Tentukan lokasi spawn di pintu No
+            Debug.Log("Player memilih No. Map berikutnya akan muncul di: " + nextSpawnLocation.position);
+            ProcessMap(); // Proses map baru dengan kemungkinan anomali
         }
         else
         {
-            WrongChoice(); // Pemain salah, ada anomali tetapi memilih No
+            Debug.LogWarning("Map sudah di-spawn. Menunggu map baru.");
         }
     }
 
-    private void CorrectChoice()
+    private void ProcessMap()
     {
-        scoreCounter++;  // Tambahkan score
-        UpdateScoreUI(); // Update tampilan score
-        Debug.Log("Pilihan benar! Skor sekarang: " + scoreCounter);
-        SpawnNewMap();   // Spawn map baru
-    }
+        // Spawn map baru di lokasi yang ditentukan
+        currentMapInstance = Instantiate(mapPrefab, nextSpawnLocation.position, nextSpawnLocation.rotation);
 
-    private void WrongChoice()
-    {
-        scoreCounter = 0; // Reset score ke 0
-        UpdateScoreUI();  // Update tampilan score
-        Debug.Log("Pilihan salah! Skor di-reset.");
-        SpawnNewMap();    // Spawn map baru
-    }
+        // Tentukan apakah akan ada anomali di map baru
+        isAnomalyPresent = Random.Range(0, 100) < anomalyChance;
+        Debug.Log("Anomali hadir: " + isAnomalyPresent);
 
-    private void SpawnNewMap()
-    {
-        // Reset kondisi untuk map baru
-        if (currentMapInstance != null)
+        // Terapkan anomali jika perlu
+        if (isAnomalyPresent)
         {
-            Destroy(currentMapInstance); // Hapus map lama
+            ApplyAnomaly();
         }
-        mapSpawned = false; // Reset agar map bisa di-*spawn* lagi
-        isAnomalyPresent = false;
 
-        Debug.Log("Map baru siap untuk di-*spawn* di lokasi: " + nextSpawnLocation.position);
+        mapSpawned = true; // Tandai bahwa map sudah di-spawn
+    }
+
+    // Terapkan anomali pada objek di dalam map
+    private void ApplyAnomaly()
+    {
+        if (objectsInMap.Count == 0)
+        {
+            Debug.LogWarning("Tidak ada objek di dalam map untuk menerima anomali.");
+            return;
+        }
+
+        int randomIndex = Random.Range(0, objectsInMap.Count);
+        GameObject selectedObject = objectsInMap[randomIndex];
+
+        int anomalyType = Random.Range(0, 3); // 0 = Hilang, 1 = Duplikat, 2 = Pindah
+        Debug.Log("Anomali diterapkan pada objek: " + selectedObject.name + ", Tipe: " + anomalyType);
+
+        if (anomalyType == 0) // Anomali: Hilangkan objek
+        {
+            selectedObject.SetActive(false);
+        }
+        else if (anomalyType == 1) // Anomali: Duplikat objek
+        {
+            Vector3 duplicatePosition = selectedObject.transform.position + new Vector3(1, 0, 0);
+            Instantiate(selectedObject, duplicatePosition, selectedObject.transform.rotation);
+        }
+        else if (anomalyType == 2) // Anomali: Pindah objek
+        {
+            Vector3 randomOffset = new Vector3(Random.Range(-2, 2), 0, Random.Range(-2, 2));
+            selectedObject.transform.position += randomOffset;
+        }
     }
 
     private void UpdateScoreUI()
@@ -156,5 +122,10 @@ public class Sc_Map : MonoBehaviour
         {
             scoreText.text = "Score: " + scoreCounter;
         }
+    }
+
+    public void ResetMapSpawn()
+    {
+        mapSpawned = false; // Digunakan untuk mereset status map setelah pilihan dibuat
     }
 }
