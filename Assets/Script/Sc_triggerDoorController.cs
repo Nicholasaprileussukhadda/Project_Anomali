@@ -24,4 +24,20 @@ public class Sc_triggerDoorController : MonoBehaviour
             }
         }
     }
+
+    // Fungsi baru untuk reset trigger
+  public void ResetTrigger()
+{
+    gameObject.SetActive(true); // Aktifkan kembali trigger pintu
+    openTrigger = true; // Atur openTrigger ke true (siap untuk dibuka)
+    closeTrigger = false; // Reset closeTrigger ke false setelah map di-*spawn*
+
+    // Pastikan Box Collider diaktifkan kembali
+    BoxCollider collider = GetComponent<BoxCollider>();
+    if (collider != null)
+    {
+        collider.enabled = true; // Aktifkan kembali Box Collider
+    }
+}
+
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Sc_triggerDoorYesController : MonoBehaviour
 {
-  [SerializeField] private Animator myDoor = null;
+    [SerializeField] private Animator myDoor = null;
     [SerializeField] private bool openTrigger = false;
     [SerializeField] private bool closeTrigger = false;
 
@@ -23,5 +23,13 @@ public class Sc_triggerDoorYesController : MonoBehaviour
                 gameObject.SetActive(false);
             }
         }
+    }
+
+    // Fungsi reset trigger seperti di Sc_triggerDoorController
+    public void ResetTrigger()
+    {
+        gameObject.SetActive(true); // Aktifkan kembali trigger pintu
+        openTrigger = true; // Atur openTrigger ke true (siap untuk dibuka)
+        closeTrigger = false; // Reset closeTrigger ke false setelah map di-*spawn*
     }
 }
