@@ -1,16 +1,13 @@
 using UnityEngine;
 
-public class CharacterControllerScript : MonoBehaviour
+public class charController : MonoBehaviour
 {
-    public float moveSpeed = 5f; // Kecepatan gerak
+    public float moveSpeed = 3f; // Kecepatan gerak
+    private CharacterController controller; // Komponen CharacterController
+    private Vector3 velocity; // Menyimpan kecepatan gravitasi
     public float gravity = -9.81f; // Gravitasi
-    public Transform cameraTransform; // Transform dari kamera untuk menentukan arah gerakan
-    private CharacterController controller;
-    private Vector3 velocity; // Menyimpan kecepatan untuk gravitasi
-    private bool isGrounded; // Mengecek apakah karakter di tanah
     private Animator animator; // Animator untuk mengatur animasi
-    public float rotationSpeed = 10f; // Kecepatan rotasi tubuh karakter
-    public float mouseThreshold = 0.1f; // Ambang batas untuk pergerakan mouse
+    public Transform cameraTransform; // Tambahkan referensi ke transformasi kamera
 
     void Start()
     {
@@ -21,58 +18,47 @@ public class CharacterControllerScript : MonoBehaviour
 
     void Update()
     {
-        // Mengecek apakah karakter berada di tanah
-        isGrounded = controller.isGrounded;
+        // Input untuk pergerakan Maju/Mundur dan Kiri/Kanan
+        float h = Input.GetAxis("Horizontal"); // A/D untuk Kiri/Kanan
+        float v = Input.GetAxis("Vertical"); // W/S untuk Maju/Mundur
 
-        if (isGrounded && velocity.y < 0)
+        // Mengambil arah gerakan dari input WASD relatif terhadap rotasi kamera
+        Vector3 forward = cameraTransform.forward; // Ambil arah depan kamera
+        Vector3 right = cameraTransform.right; // Ambil arah kanan kamera
+
+        // Hapus komponen vertikal dari arah kamera agar karakter tidak bergerak ke atas/bawah
+        forward.y = 0f;
+        right.y = 0f;
+
+        // Normalisasi vektor untuk menghindari pergerakan lebih cepat secara diagonal
+        forward.Normalize();
+        right.Normalize();
+
+        // Menghitung vektor gerak sesuai arah kamera
+        Vector3 move = forward * v + right * h;
+
+        // Gerakkan karakter menggunakan CharacterController
+        controller.Move(move * moveSpeed * Time.deltaTime);
+
+        // Terapkan gravitasi
+        if (controller.isGrounded && velocity.y < 0)
         {
-            velocity.y = -2f; // Mengatur sedikit tekanan ke tanah agar karakter tidak melayang
+            velocity.y = -2f; // Jika karakter di tanah, reset gravitasi
         }
 
-        // Input untuk pergerakan WASD
-        float horizontal = Input.GetAxis("Horizontal"); // A/D untuk Kiri/Kanan
-        float vertical = Input.GetAxis("Vertical"); // W/S untuk Maju/Mundur
-        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
-
-        // Set animasi berdasarkan input gerakan
-        float speed = direction.magnitude; // Menghitung kecepatan berdasarkan input gerakan
-        animator.SetFloat("Speed", speed); // Set parameter animasi "Speed" di Animator
-
-        // Jika ada input gerakan dari WASD
-        if (speed >= 0.1f)
-        {
-            // Arahkan gerakan mengikuti rotasi kamera
-            Vector3 forward = cameraTransform.forward; // Dapatkan arah depan kamera
-            Vector3 right = cameraTransform.right; // Dapatkan arah kanan kamera
-
-            // Hilangkan komponen vertikal untuk pergerakan horizontal yang benar
-            forward.y = 0f;
-            right.y = 0f;
-
-            // Normalisasi agar vektor tetap valid
-            forward.Normalize();
-            right.Normalize();
-
-            // Tentukan arah gerakan akhir: vertikal mengikuti arah depan kamera, horizontal mengikuti arah kanan/kiri
-            Vector3 moveDirection = forward * vertical + right * horizontal;
-
-            // Gerakkan karakter
-            controller.Move(moveDirection * moveSpeed * Time.deltaTime);
-        }
-
-        // Input dari mouse untuk rotasi kamera
-        float mouseX = Input.GetAxis("Mouse X"); // Input rotasi horizontal dari mouse
-
-        // Hanya rotasi kamera jika pergerakan mouse melebihi ambang batas
-        if (Mathf.Abs(mouseX) > mouseThreshold)
-        {
-            // Putar tubuh karakter agar selalu mengikuti rotasi horizontal kamera
-            Quaternion targetRotation = Quaternion.Euler(0f, cameraTransform.eulerAngles.y, 0f);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        }
-
-        // Menambahkan gravitasi ke karakter
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime); // Terapkan gravitasi
+
+        // Atur animasi berdasarkan input gerakan
+        if (h != 0 || v != 0)
+        {
+            // Jika ada input gerakan, aktifkan animasi berjalan
+            animator.SetBool("stat_jalan", true);
+        }
+        else
+        {
+            // Jika tidak ada input, tetap idle
+            animator.SetBool("stat_jalan", false);
+        }
     }
 }

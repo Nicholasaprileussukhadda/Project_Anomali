@@ -3,6 +3,7 @@ using UnityEngine;
 public class kamera : MonoBehaviour
 {
     public float mouseSensitivity = 100f; // Sensitivitas mouse
+    public Transform characterBody; // Referensi ke badan karakter (untuk rotasi horizontal)
 
     private float xRotation = 0f; // Rotasi vertikal (pitch)
 
@@ -23,10 +24,10 @@ public class kamera : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f); // Batasi sudut pandang vertikal agar tidak terlalu jauh ke atas/bawah
 
-        // Rotasi horizontal kamera (kiri-kanan)
-        transform.Rotate(Vector3.up * mouseX);
+        // Terapkan rotasi vertikal ke kamera (pitch)
+        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
-        // Terapkan rotasi vertikal
-        transform.localRotation = Quaternion.Euler(xRotation, transform.localEulerAngles.y, 0f);
+        // Terapkan rotasi horizontal ke badan karakter (yaw), menggeser sesuai dengan input mouse X
+        characterBody.Rotate(Vector3.up * mouseX); // Rotasi horizontal karakter mengikuti gerakan mouse kiri/kanan
     }
 }
