@@ -146,9 +146,10 @@ public class Sc_Map : MonoBehaviour
 
         // Jalankan anomali jika ada
         HandleAnomaly();
-        if(GameController.Instance.mapIndex>1){
+        if(GameController.Instance.mapIndex>=1){
             anomalyScript.isAnomalyPresent = isAnomalyPresent;
         }
+        Debug.Log("Anomaly is set to " + (isAnomalyPresent ? "true" : "false"));
     }
 
     public void PlayerChoseYes()
