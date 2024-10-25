@@ -496,6 +496,11 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!1 &929147553 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 165592633489438055, guid: ea69b7126dab7447d9eef311b0df7fd5, type: 3}
+  m_PrefabInstance: {fileID: 4408953888671984394}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -603,6 +608,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseSensitivity: 100
   characterBody: {fileID: 906266965}
+--- !u!1 &1499623054 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 566116945427115415, guid: ea69b7126dab7447d9eef311b0df7fd5, type: 3}
+  m_PrefabInstance: {fileID: 4408953888671984394}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1597894699
 GameObject:
   m_ObjectHideFlags: 0
@@ -871,6 +881,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 165592633489438055, guid: ea69b7126dab7447d9eef311b0df7fd5, type: 3}
+      propertyPath: m_TagString
+      value: AnomalyObject
+      objectReference: {fileID: 0}
     - target: {fileID: 251967224611765815, guid: ea69b7126dab7447d9eef311b0df7fd5, type: 3}
       propertyPath: player
       value: 
@@ -879,6 +893,18 @@ PrefabInstance:
       propertyPath: scoreText
       value: 
       objectReference: {fileID: 893548028}
+    - target: {fileID: 251967224611765815, guid: ea69b7126dab7447d9eef311b0df7fd5, type: 3}
+      propertyPath: objectsInMap.Array.data[0]
+      value: 
+      objectReference: {fileID: 929147553}
+    - target: {fileID: 251967224611765815, guid: ea69b7126dab7447d9eef311b0df7fd5, type: 3}
+      propertyPath: objectsInMap.Array.data[1]
+      value: 
+      objectReference: {fileID: 1499623054}
+    - target: {fileID: 566116945427115415, guid: ea69b7126dab7447d9eef311b0df7fd5, type: 3}
+      propertyPath: m_TagString
+      value: AnomalyObject
+      objectReference: {fileID: 0}
     - target: {fileID: 1074107802066178420, guid: ea69b7126dab7447d9eef311b0df7fd5, type: 3}
       propertyPath: m_Name
       value: Map
