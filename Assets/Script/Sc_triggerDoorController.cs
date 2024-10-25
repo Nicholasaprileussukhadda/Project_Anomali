@@ -4,40 +4,40 @@ using UnityEngine;
 
 public class Sc_triggerDoorController : MonoBehaviour
 {
-  [SerializeField] private Animator myDoor = null;
-    [SerializeField] private bool openTrigger = false;
-    [SerializeField] private bool closeTrigger = false;
+    [SerializeField] private Animator myDoor = null;
+    private bool isOpen = false; // Menyimpan status pintu apakah terbuka atau tidak
+    private bool playerInRange = false; // Menyimpan status apakah player berada di dalam trigger
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            if (openTrigger)
-            {
-                myDoor.Play("doorTriggerOpen", 0, 0.0f);
-                gameObject.SetActive(false);
-            }
-            if (closeTrigger)
-            {
-                myDoor.Play("doorTriggerClosed", 0, 0.0f);
-                gameObject.SetActive(false);
-            }
+            playerInRange = true; // Jika player masuk ke area trigger
         }
     }
 
-    // Fungsi baru untuk reset trigger
-  public void ResetTrigger()
-{
-    gameObject.SetActive(true); // Aktifkan kembali trigger pintu
-    openTrigger = true; // Atur openTrigger ke true (siap untuk dibuka)
-    closeTrigger = false; // Reset closeTrigger ke false setelah map di-*spawn*
-
-    // Pastikan Box Collider diaktifkan kembali
-    BoxCollider collider = GetComponent<BoxCollider>();
-    if (collider != null)
+    private void OnTriggerExit(Collider other)
     {
-        collider.enabled = true; // Aktifkan kembali Box Collider
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false; // Jika player keluar dari area trigger
+        }
     }
-}
 
+    private void Update()
+    {
+        if (playerInRange && Input.GetMouseButtonDown(0)) // Jika player berada di trigger dan klik kiri mouse
+        {
+            if (!isOpen) // Jika pintu sedang tertutup, maka buka pintunya
+            {
+                myDoor.Play("doorTriggerOpen", 0, 0.0f);
+                isOpen = true;
+            }
+            else // Jika pintu sedang terbuka, maka tutup pintunya
+            {
+                myDoor.Play("doorTriggerClosed", 0, 0.0f);
+                isOpen = false;
+            }
+        }
+    }
 }

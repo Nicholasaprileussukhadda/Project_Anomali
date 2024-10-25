@@ -5,44 +5,39 @@ using UnityEngine;
 public class Sc_triggerDoorNoController : MonoBehaviour
 {
     [SerializeField] private Animator myDoor = null;
-    [SerializeField] private bool openTrigger = false;
-    [SerializeField] private bool closeTrigger = false;
+    private bool isOpen = false; // Menyimpan status pintu apakah terbuka atau tidak
+    private bool playerInRange = false; // Menyimpan status apakah player berada di dalam trigger
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Collider yang masuk: " + other.name);
-
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player masuk trigger untuk pintu NO.");
-            if (openTrigger)
-            {
-                myDoor.Play("doorNoTriggerOpen", 0, 0.0f);
-                Debug.Log("Animasi doorNoTriggerOpen dijalankan.");
-                gameObject.SetActive(false); // Disable trigger setelah animasi berjalan
-            }
-            if (closeTrigger)
-            {
-                myDoor.Play("doorNoTriggerClose", 0, 0.0f);
-                Debug.Log("Animasi doorNoTriggerClose dijalankan.");
-                gameObject.SetActive(false); // Disable trigger setelah animasi berjalan
-            }
+            playerInRange = true; // Jika player masuk ke area trigger
         }
     }
 
-    // Fungsi reset trigger seperti di Sc_triggerDoorController
-    public void ResetTrigger()
+    private void OnTriggerExit(Collider other)
     {
-        gameObject.SetActive(true); // Aktifkan kembali trigger pintu
-        openTrigger = true; // Atur openTrigger ke true untuk membuka pintu
-        closeTrigger = false; // Pastikan closeTrigger di-reset ke false
-
-        // Pastikan Box Collider diaktifkan kembali
-        BoxCollider collider = GetComponent<BoxCollider>();
-        if (collider != null)
+        if (other.CompareTag("Player"))
         {
-            collider.enabled = true; // Aktifkan kembali Box Collider
-            Debug.Log("Box Collider diaktifkan untuk " + gameObject.name);
+            playerInRange = false; // Jika player keluar dari area trigger
+        }
+    }
+
+    private void Update()
+    {
+        if (playerInRange && Input.GetMouseButtonDown(0)) // Jika player berada di trigger dan klik kiri mouse
+        {
+            if (!isOpen) // Jika pintu sedang tertutup, maka buka pintunya
+            {
+                myDoor.Play("doorNoTriggerOpen", 0, 0.0f);
+                isOpen = true;
+            }
+            else // Jika pintu sedang terbuka, maka tutup pintunya
+            {
+                myDoor.Play("doorNoTriggerClose", 0, 0.0f);
+                isOpen = false;
+            }
         }
     }
 }

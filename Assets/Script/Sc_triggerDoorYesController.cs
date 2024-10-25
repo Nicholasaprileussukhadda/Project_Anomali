@@ -5,31 +5,39 @@ using UnityEngine;
 public class Sc_triggerDoorYesController : MonoBehaviour
 {
     [SerializeField] private Animator myDoor = null;
-    [SerializeField] private bool openTrigger = false;
-    [SerializeField] private bool closeTrigger = false;
+    private bool isOpen = false; // Menyimpan status pintu apakah terbuka atau tidak
+    private bool playerInRange = false; // Menyimpan status apakah player berada di dalam trigger
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            if (openTrigger)
-            {
-                myDoor.Play("doorYesTriggerOpen", 0, 0.0f);
-                gameObject.SetActive(false);
-            }
-            if (closeTrigger)
-            {
-                myDoor.Play("doorYesTriggerClose", 0, 0.0f);
-                gameObject.SetActive(false);
-            }
+            playerInRange = true; // Jika player masuk ke area trigger
         }
     }
 
-    // Fungsi reset trigger seperti di Sc_triggerDoorController
-    public void ResetTrigger()
+    private void OnTriggerExit(Collider other)
     {
-        gameObject.SetActive(true); // Aktifkan kembali trigger pintu
-        openTrigger = true; // Atur openTrigger ke true (siap untuk dibuka)
-        closeTrigger = false; // Reset closeTrigger ke false setelah map di-*spawn*
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false; // Jika player keluar dari area trigger
+        }
+    }
+
+    private void Update()
+    {
+        if (playerInRange && Input.GetMouseButtonDown(0)) // Jika player berada di trigger dan klik kiri mouse
+        {
+            if (!isOpen) // Jika pintu sedang tertutup, maka buka pintunya
+            {
+                myDoor.Play("doorYesTriggerOpen", 0, 0.0f);
+                isOpen = true;
+            }
+            else // Jika pintu sedang terbuka, maka tutup pintunya
+            {
+                myDoor.Play("doorYesTriggerClose", 0, 0.0f);
+                isOpen = false;
+            }
+        }
     }
 }
