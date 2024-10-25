@@ -147,16 +147,20 @@ public class Sc_Map : MonoBehaviour
 
         Debug.Log("Player memilih Yes. Status Anomali sebelum pengecekan: " + isAnomalyPresent);
 
+        // Debugging tambahan untuk melihat apakah isAnomalyPresent benar-benar true
         if (isAnomalyPresent)
         {
+            // Jika ada anomali, tebakan benar, tambah poin
             Debug.Log("Tebakan benar. Ada anomali di map ke-" + GameController.Instance.mapIndex + ". Menambah poin.");
             AddScore(1);
         }
         else
         {
+            // Jika tidak ada anomali, tebakan salah, reset skor
             Debug.Log("Tebakan salah. Tidak ada anomali di map ke-" + GameController.Instance.mapIndex + ". Mereset poin.");
             ResetScore();
         }
+
         UpdateScoreText();
         SpawnNewMap();  // Spawn map setelah player memilih
     }
@@ -167,19 +171,25 @@ public class Sc_Map : MonoBehaviour
 
         Debug.Log("Player memilih No. Status Anomali sebelum pengecekan: " + isAnomalyPresent);
 
+        // Debugging tambahan untuk melihat apakah isAnomalyPresent benar-benar false
         if (!isAnomalyPresent)
         {
+            // Jika tidak ada anomali, tebakan benar, tambah poin
             Debug.Log("Tebakan benar. Tidak ada anomali di map ke-" + GameController.Instance.mapIndex + ". Menambah poin.");
             AddScore(1);
         }
         else
         {
+            // Jika ada anomali, tebakan salah, reset skor
             Debug.Log("Tebakan salah. Ada anomali di map ke-" + GameController.Instance.mapIndex + ". Mereset poin.");
             ResetScore();
         }
+
         UpdateScoreText();
         SpawnNewMap();  // Spawn map setelah player memilih
     }
+
+
 
     private void AddScore(int points)
     {
