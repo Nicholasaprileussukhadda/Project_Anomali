@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Sc_Map : MonoBehaviour
 {
@@ -21,9 +22,11 @@ public class Sc_Map : MonoBehaviour
     private Transform nextSpawnLocation;
     private bool isFirstMap = true; // Variabel untuk menentukan apakah ini map pertama
 
+    public Text scoreText;
+
     private void Start()
     {
-        isAnomalyPresent = false; // Map pertama selalu tanpa anomali
+        isAnomalyPresent = false;
     }
 
     public void PlayerChoseYes()
@@ -41,6 +44,7 @@ public class Sc_Map : MonoBehaviour
             Debug.Log("Player salah menebak anomali. Mereset poin.");
             ResetScore(); // Salah, tidak ada anomali, jadi score di-reset ke 0
         }
+        UpdateScoreText();
 
         SpawnNewMap();
     }
@@ -108,7 +112,6 @@ public class Sc_Map : MonoBehaviour
         isAnomalyPresent = Random.Range(0, 100) < anomalyChance;
         Debug.Log("Apakah ada anomali? " + isAnomalyPresent);
     }
-
     Debug.Log("Map berhasil di-*spawn* di lokasi: " + nextSpawnLocation.position);
 }
 
@@ -126,5 +129,9 @@ public class Sc_Map : MonoBehaviour
     {
         scoreCounter = 0; // Reset score ke 0
         Debug.Log("Tebakan salah. Skor direset ke 0.");
+    }
+
+    private void UpdateScoreText(){
+        scoreText.text = "Score: " + scoreCounter;
     }
 }
