@@ -21,12 +21,19 @@ public class Sc_Map : MonoBehaviour
     private Dictionary<GameObject, bool> originalActiveStates = new Dictionary<GameObject, bool>();  // Menyimpan state awal (aktif/tidak aktif)
 
     public Text scoreText;
+    public GameObject anomalyStoring;
+    private Sc_storingIsAnomalyPresent anomalyScript;
 
     private void Start()
     {
         // Set initial spawn location ke spawnLocationYes atau spawnLocationNo
         nextSpawnLocation = spawnLocationNo != null ? spawnLocationNo : spawnLocationYes;
-        Debug.Log("Memulai game, mapIndex diatur ke: " + GameController.Instance.mapIndex);
+        // Debug.Log("Memulai game, mapIndex diatur ke: " + GameController.Instance.mapIndex);
+
+        if(GameController.Instance.mapIndex>1){
+            anomalyScript = anomalyStoring.GetComponent<Sc_storingIsAnomalyPresent>();
+            isAnomalyPresent = anomalyScript.isAnomalyPresent;
+        }
     }
 
     private void HandleAnomaly()
@@ -43,13 +50,13 @@ public class Sc_Map : MonoBehaviour
             switch (anomalyType)
             {
                 case 0: // Sembunyikan objek alih-alih menghapusnya
-                    Debug.Log("Anomali: Menyembunyikan objek " + chosenObject.name);
+                    // Debug.Log("Anomali: Menyembunyikan objek " + chosenObject.name);
                     chosenObject.SetActive(false); // Sembunyikan objek
                     break;
 
                 case 1: // Geser objek ke posisi baru
                     Vector3 randomOffset = new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f));
-                    Debug.Log("Anomali: Menggeser objek " + chosenObject.name + " ke lokasi baru.");
+                    // Debug.Log("Anomali: Menggeser objek " + chosenObject.name + " ke lokasi baru.");
                     chosenObject.transform.position += randomOffset;
                     break;
 
@@ -57,13 +64,13 @@ public class Sc_Map : MonoBehaviour
                     Vector3 duplicateOffset = new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f));
                     GameObject duplicateObject = Instantiate(chosenObject, chosenObject.transform.position + duplicateOffset, chosenObject.transform.rotation);
                     objectsInMap.Add(duplicateObject); // Tambahkan duplikat ke daftar objek
-                    Debug.Log("Anomali: Menduplicate objek " + chosenObject.name + " dan memindahkan duplikat.");
+                    // Debug.Log("Anomali: Menduplicate objek " + chosenObject.name + " dan memindahkan duplikat.");
                     break;
             }
         }
         else
         {
-            Debug.Log("Tidak ada anomali di map atau daftar objectsInMap kosong.");
+            // Debug.Log("Tidak ada anomali di map atau daftar objectsInMap kosong.");
         }
     }
 
@@ -82,7 +89,7 @@ public class Sc_Map : MonoBehaviour
 
         originalPositions.Clear();  // Kosongkan daftar setelah reset
         originalActiveStates.Clear();
-        Debug.Log("Semua anomali telah di-reset.");
+        // Debug.Log("Semua anomali telah di-reset.");
     }
 
     // Spawn map baru setelah player membuat pilihan
@@ -93,19 +100,19 @@ public class Sc_Map : MonoBehaviour
 
         // Map hanya di-*spawn* sekali per tebakan
         GameController.Instance.IncrementMapIndex();  // Increment map index untuk setiap map baru
-        Debug.Log("Map ke-" + GameController.Instance.mapIndex + " akan di-*spawn* di lokasi: " + nextSpawnLocation.position);
+        // Debug.Log("Map ke-" + GameController.Instance.mapIndex + " akan di-*spawn* di lokasi: " + nextSpawnLocation.position);
 
         // Hancurkan map sebelumnya, jika ada
         if (currentMapInstance != null)
         {
             Destroy(currentMapInstance);
-            Debug.Log("Map sebelumnya dihancurkan.");
+            // Debug.Log("Map sebelumnya dihancurkan.");
         }
 
         // Spawn map baru di nextSpawnLocation
         GameObject newMapInstance = Instantiate(mapPrefab, nextSpawnLocation.position + spawnOffset, nextSpawnLocation.rotation);
         currentMapInstance = newMapInstance;
-        Debug.Log("Map baru berhasil di-*spawn* di lokasi: " + nextSpawnLocation.position);
+        // Debug.Log("Map baru berhasil di-*spawn* di lokasi: " + nextSpawnLocation.position);
 
         // Aktifkan objek dalam map baru dan isi daftar `objectsInMap` hanya dengan objek dari "anomalyItems"
         objectsInMap.Clear();
@@ -118,46 +125,50 @@ public class Sc_Map : MonoBehaviour
                 originalPositions[child.gameObject] = child.transform.position;  // Simpan posisi awal objek
                 originalActiveStates[child.gameObject] = child.gameObject.activeSelf;  // Simpan state awal (aktif/tidak aktif)
             }
-            Debug.Log("Daftar objectsInMap diisi dengan " + objectsInMap.Count + " objek dari anomalyItems.");
+            // Debug.Log("Daftar objectsInMap diisi dengan " + objectsInMap.Count + " objek dari anomalyItems.");
         }
         else
         {
-            Debug.LogWarning("anomalyItems tidak ditemukan di map ini.");
+            // Debug.LogWarning("anomalyItems tidak ditemukan di map ini.");
         }
 
         // Tentukan apakah ada anomali di map baru
         if (GameController.Instance.mapIndex == 1)
         {
             isAnomalyPresent = false;  // Tidak ada anomali di map pertama
-            Debug.Log("Map pertama, tidak ada anomali.");
+            // Debug.Log("Map pertama, tidak ada anomali.");
         }
         else
         {
             isAnomalyPresent = Random.Range(0, 100) < anomalyChance;
-            Debug.Log("Anomali di-*set* untuk map ke-" + GameController.Instance.mapIndex + ": " + isAnomalyPresent);
+            // Debug.Log("Anomali di-*set* untuk map ke-" + GameController.Instance.mapIndex + ": " + isAnomalyPresent);
         }
 
         // Jalankan anomali jika ada
         HandleAnomaly();
+        if(GameController.Instance.mapIndex>1){
+            anomalyScript.isAnomalyPresent = isAnomalyPresent;
+        }
     }
 
     public void PlayerChoseYes()
     {
         nextSpawnLocation = spawnLocationYes;  // Tentukan spawn location untuk pilihan Yes
 
-        Debug.Log("Player memilih Yes. Status Anomali sebelum pengecekan: " + isAnomalyPresent);
+        // Debug.Log("Player memilih Yes. Status Anomali sebelum pengecekan: " + isAnomalyPresent);
 
         // Debugging tambahan untuk melihat apakah isAnomalyPresent benar-benar true
         if (isAnomalyPresent)
         {
             // Jika ada anomali, tebakan benar, tambah poin
-            Debug.Log("Tebakan benar. Ada anomali di map ke-" + GameController.Instance.mapIndex + ". Menambah poin.");
+            // Debug.Log("Tebakan benar. Ada anomali di map ke-" + GameController.Instance.mapIndex + ". Menambah poin.");
             AddScore(1);
         }
         else
         {
             // Jika tidak ada anomali, tebakan salah, reset skor
-            Debug.Log("Tebakan salah. Tidak ada anomali di map ke-" + GameController.Instance.mapIndex + ". Mereset poin.");
+            // Debug.Log("Tebakan salah. Tidak ada anomali di map ke-" + GameController.Instance.mapIndex + ". Mereset poin.");
+            Debug.Log("I chose Yes, but the Anomaly said there is"+(isAnomalyPresent?"!":" none!"));
             ResetScore();
         }
 
@@ -169,19 +180,20 @@ public class Sc_Map : MonoBehaviour
     {
         nextSpawnLocation = spawnLocationNo;  // Tentukan spawn location untuk pilihan No
 
-        Debug.Log("Player memilih No. Status Anomali sebelum pengecekan: " + isAnomalyPresent);
+        // Debug.Log("Player memilih No. Status Anomali sebelum pengecekan: " + isAnomalyPresent);
 
         // Debugging tambahan untuk melihat apakah isAnomalyPresent benar-benar false
         if (!isAnomalyPresent)
         {
             // Jika tidak ada anomali, tebakan benar, tambah poin
-            Debug.Log("Tebakan benar. Tidak ada anomali di map ke-" + GameController.Instance.mapIndex + ". Menambah poin.");
+            // Debug.Log("Tebakan benar. Tidak ada anomali di map ke-" + GameController.Instance.mapIndex + ". Menambah poin.");
             AddScore(1);
         }
         else
         {
             // Jika ada anomali, tebakan salah, reset skor
-            Debug.Log("Tebakan salah. Ada anomali di map ke-" + GameController.Instance.mapIndex + ". Mereset poin.");
+            // Debug.Log("Tebakan salah. Ada anomali di map ke-" + GameController.Instance.mapIndex + ". Mereset poin.");
+            Debug.Log("I chose No, but the Anomaly said there is"+(isAnomalyPresent?"!":"none!"));
             ResetScore();
         }
 
@@ -205,6 +217,6 @@ public class Sc_Map : MonoBehaviour
 
     private void UpdateScoreText()
     {
-        scoreText.text = "Score: " + GameController.Instance.scoreCounter;
+        scoreText.text = "Rooms: " + GameController.Instance.scoreCounter;
     }
 }
