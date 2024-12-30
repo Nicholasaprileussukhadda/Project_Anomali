@@ -206,9 +206,13 @@ public class Sc_Map : MonoBehaviour
 
     private void AddScore(int points)
     {
-        GameController.Instance.scoreCounter += points;
+        for (int i = 0; i < points; i++)
+        {
+            GameController.Instance.IncrementScore();
+        }
         Debug.Log("Poin ditambahkan: " + points + ", Total skor saat ini: " + GameController.Instance.scoreCounter);
     }
+
 
     private void ResetScore()
     {
