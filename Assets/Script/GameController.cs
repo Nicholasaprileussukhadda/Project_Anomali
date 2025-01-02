@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);  // Pastikan GameController tidak dihancurkan antara scene
+            SceneManager.sceneLoaded += OnSceneLoaded; // Tambahkan event handler untuk sceneLoaded
             Debug.Log("GameController dibuat, mapIndex awal: " + mapIndex);
         }
         else
@@ -37,6 +38,22 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         Debug.Log("Game dimulai, mapIndex awal: " + mapIndex);
+        ResetScore(); // Reset skor saat game dimulai
+        ResetMapIndex(); // Reset mapIndex saat game dimulai
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Cari WinMenu di scene yang baru dimuat
+        winUIController = FindObjectOfType<WinMenu>();
+        if (winUIController == null)
+        {
+            Debug.LogError("winUIController tidak ditemukan di scene.");
+        }
+        else
+        {
+            Debug.Log("winUIController berhasil ditemukan dan diatur.");
+        }
     }
 
     public void IncrementMapIndex()
@@ -51,7 +68,7 @@ public class GameController : MonoBehaviour
         Debug.Log("Score di-*increment* ke: " + scoreCounter);
         if (scoreCounter >= 5)
         {
-            EndGame(); // Panggil fungsi untuk mengakhiri permainan ketika skor mencapai 1
+            EndGame(); // Panggil fungsi untuk mengakhiri permainan ketika skor mencapai 5
         }
     }
 
@@ -68,7 +85,6 @@ public class GameController : MonoBehaviour
         {
             Debug.LogError("winUIController tidak diatur di Inspector.");
         }
-        // Anda bisa menambahkan logika lain untuk mengakhiri permainan, seperti menghentikan input pemain
     }
 
     // Fungsi untuk mengatur status game kembali ke "Playing"
@@ -95,5 +111,19 @@ public class GameController : MonoBehaviour
             currentState = GameState.Playing;
             Time.timeScale = 1; // Lanjutkan aktivitas game
         }
+    }
+
+    // Fungsi untuk mereset skor
+    public void ResetScore()
+    {
+        scoreCounter = 0;
+        Debug.Log("Score di-reset ke: " + scoreCounter);
+    }
+
+    // Fungsi untuk mereset mapIndex
+    public void ResetMapIndex()
+    {
+        mapIndex = 1;
+        Debug.Log("mapIndex di-reset ke: " + mapIndex);
     }
 }

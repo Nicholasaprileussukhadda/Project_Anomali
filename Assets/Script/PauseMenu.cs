@@ -54,6 +54,8 @@ public class PauseMenu : MonoBehaviour
 
     public void goToMainMenu()
     {
+        GameController.Instance.ResetScore(); // Reset skor saat kembali ke menu utama
+        GameController.Instance.ResetMapIndex(); // Reset mapIndex saat kembali ke menu utama
         Time.timeScale = 1;  // Pastikan waktu berjalan normal sebelum pindah ke main menu
         SceneManager.LoadScene("MainMenu");  // Pindah ke scene MainMenu
     }
@@ -63,3 +65,4 @@ public class PauseMenu : MonoBehaviour
         Application.Quit();  // Keluar dari aplikasi
     }
 }
+

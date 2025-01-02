@@ -32,6 +32,8 @@ public class WinMenu : MonoBehaviour
 
     public void RestartGame()
     {
+        GameController.Instance.ResetScore(); // Reset skor saat game dimulai ulang
+        GameController.Instance.ResetMapIndex(); // Reset mapIndex saat game dimulai ulang
         Time.timeScale = 1; // Kembalikan aktivitas game sebelum memuat ulang scene
         Cursor.visible = false; // Sembunyikan cursor saat game kembali
         Cursor.lockState = CursorLockMode.Locked; // Kunci cursor di tengah layar
@@ -40,10 +42,12 @@ public class WinMenu : MonoBehaviour
 
     public void GoToMainMenu()
     {
+        GameController.Instance.ResetScore(); // Reset skor saat kembali ke menu utama
+        GameController.Instance.ResetMapIndex(); // Reset mapIndex saat kembali ke menu utama
         Time.timeScale = 1; // Kembalikan aktivitas game sebelum memuat scene utama
-        Cursor.visible = false; // Sembunyikan cursor saat game kembali
-        Cursor.lockState = CursorLockMode.Locked; // Kunci cursor di tengah layar
-        SceneManager.LoadScene("MainMenu"); // Pastikan Anda memiliki scene bernama "MainMenu"
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        SceneManager.LoadScene("MainMenu");
     }
 
     public void QuitGame()
@@ -51,3 +55,4 @@ public class WinMenu : MonoBehaviour
         Application.Quit(); // Keluar dari aplikasi
     }
 }
+
