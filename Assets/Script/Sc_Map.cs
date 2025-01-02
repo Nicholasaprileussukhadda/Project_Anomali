@@ -112,6 +112,8 @@ public class Sc_Map : MonoBehaviour
         // Spawn map baru di nextSpawnLocation
         GameObject newMapInstance = Instantiate(mapPrefab, nextSpawnLocation.position + spawnOffset, nextSpawnLocation.rotation);
         currentMapInstance = newMapInstance;
+        Destroy(this.gameObject);
+        
         // Debug.Log("Map baru berhasil di-*spawn* di lokasi: " + nextSpawnLocation.position);
 
         // Aktifkan objek dalam map baru dan isi daftar `objectsInMap` hanya dengan objek dari "anomalyItems"
