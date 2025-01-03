@@ -5,6 +5,8 @@ using UnityEngine;
 public class Sc_triggerDoorYesController : MonoBehaviour
 {
     [SerializeField] private Animator myDoor = null;
+    [SerializeField] private AudioSource openSound = null; // AudioSource untuk sound effect pintu buka
+    [SerializeField] private AudioSource closeSound = null; // AudioSource untuk sound effect pintu tutup
     private bool isOpen = false; // Menyimpan status pintu apakah terbuka atau tidak
     private bool playerInRange = false; // Menyimpan status apakah player berada di dalam trigger
 
@@ -31,13 +33,22 @@ public class Sc_triggerDoorYesController : MonoBehaviour
             if (!isOpen) // Jika pintu sedang tertutup, maka buka pintunya
             {
                 myDoor.Play("doorYesTriggerOpen", 0, 0.0f);
+                openSound.Play(); // Mainkan sound effect pintu buka
                 isOpen = true;
             }
             else // Jika pintu sedang terbuka, maka tutup pintunya
             {
                 myDoor.Play("doorYesTriggerClose", 0, 0.0f);
+                StartCoroutine(PlayCloseSoundWithDelay(0.5f)); // Mainkan sound effect pintu tutup dengan delay
                 isOpen = false;
             }
         }
     }
+
+    private IEnumerator PlayCloseSoundWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        closeSound.Play();
+    }
 }
+
