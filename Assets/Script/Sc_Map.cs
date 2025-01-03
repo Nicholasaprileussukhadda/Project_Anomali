@@ -55,13 +55,13 @@ public class Sc_Map : MonoBehaviour
                     break;
 
                 case 1: // Geser objek ke posisi baru
-                    Vector3 randomOffset = new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f));
+                    Vector3 randomOffset = new Vector3(Random.Range(-2f, 2f), 0, Random.Range(-2f, 2f));
                     // Debug.Log("Anomali: Menggeser objek " + chosenObject.name + " ke lokasi baru.");
                     chosenObject.transform.position += randomOffset;
                     break;
 
                 case 2: // Duplikat objek dan geser duplikat ke posisi baru
-                    Vector3 duplicateOffset = new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f));
+                    Vector3 duplicateOffset = new Vector3(Random.Range(0f, 0f), 0, Random.Range(-2f, 2f));
                     GameObject duplicateObject = Instantiate(chosenObject, chosenObject.transform.position + duplicateOffset, chosenObject.transform.rotation);
                     objectsInMap.Add(duplicateObject); // Tambahkan duplikat ke daftar objek
                     // Debug.Log("Anomali: Menduplicate objek " + chosenObject.name + " dan memindahkan duplikat.");
